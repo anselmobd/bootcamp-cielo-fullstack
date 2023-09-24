@@ -15,6 +15,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,6 +29,15 @@ public class AppConfiguration {
 
     @Value("${cloud.aws.region}")
     private String awsRegion;
+
+    @Value("${aws.sqs.sugestoes-url}")
+    private String queueSugestaoUrl;
+
+    @Value("${aws.sqs.elogios-url}")
+    private String queueElogioUrl;
+
+    @Value("${aws.sqs.criticas-url}")
+    private String queueCriticasUrl;
 
     private AwsCredentialsProvider awsCredentialsProvider() {
         return StaticCredentialsProvider.create(
@@ -76,6 +86,17 @@ public class AppConfiguration {
         source.registerCorsConfiguration("/**", corsConfiguration);
 
         return new CorsFilter(source);
+    }
+
+    @Bean
+    public EnumMap<Type, String> sqsUrl() {
+        EnumMap<Type, String> url = new EnumMap<>(Type.class);
+        url.put(Type.ELOGIO, this.queueElogioUrl);
+        url.put(Type.CRITICA, this.queueCriticasUrl);
+        url.put(Type.SUGESTAO, this.queueSugestaoUrl);
+        System.out.println("========== url");
+        System.out.println(url);
+        return url;
     }
 
 }
