@@ -24,15 +24,16 @@ public class FeedbackService {
     private final ConcurrentHashMap<Type, LinkedList<CustomerFeedbackDTO>> sqsDataStorage;
     private static final Logger LOG = LoggerFactory.getLogger(FeedbackService.class);
     private final SqsClient sqsClient;
-    private final EnumMap<Type, String> sqsUrl;
+    private final EnumMap<Type, String> sqsType2Url;
+
     private Message message;
 
 
-    public FeedbackService(SNSPublisher snsPublisher, ConcurrentHashMap<Type, LinkedList<CustomerFeedbackDTO>> sqsDataStorage, SqsClient sqsClient, EnumMap<Type, String> sqsUrl) {
+    public FeedbackService(SNSPublisher snsPublisher, ConcurrentHashMap<Type, LinkedList<CustomerFeedbackDTO>> sqsDataStorage, SqsClient sqsClient, EnumMap<Type, String> sqsType2Url) {
         this.snsPublisher = snsPublisher;
         this.sqsDataStorage = sqsDataStorage;
         this.sqsClient = sqsClient;
-        this.sqsUrl = sqsUrl;
+        this.sqsType2Url = sqsType2Url;
     }
 
     public void sendFeedback(CustomerFeedbackRequestDTO feedback) {
@@ -79,20 +80,27 @@ public class FeedbackService {
 
     public CustomerFeedbackDTO consumeMessage (String tipoMsg) {
         CustomerFeedbackDTO feedback = new CustomerFeedbackDTO(
-                "id",
-                Status.RECEBIDO,
-                Type.valueOf(tipoMsg),
-                "mess"
+            "id",
+            Status.RECEBIDO,
+            Type.valueOf(tipoMsg),
+            "mess"
         );
         LOG.info("[consumeMessage] feedback: {}",  feedback);
 
-        LOG.info("[consumeMessage] config.sqsUrl: {}",  sqsUrl);
-        String url = sqsUrl.get(Type.valueOf(tipoMsg));
+        LOG.info("[consumeMessage] config.sqsType2Url: {}",  sqsType2Url);
+        String url = sqsType2Url.get(Type.valueOf(tipoMsg));
         LOG.info("[consumeMessage] url: {}",  url);
         Boolean ok = this.tryGetMessage(url);
         if (ok) {
-            LOG.info("[consumeMessage] feedback: {}",  message.toString());
+            LOG.info("[consumeMessage] message.toString: {}",  message.toString());
+            LOG.info("[consumeMessage] message.attributes: {}",  message.messageAttributes());
         }
+        feedback = new CustomerFeedbackDTO(
+            message.messageId(),
+            Status.RECEBIDO,
+            Type.valueOf(tipoMsg),
+            "message"
+        );
         return feedback;
     }
 

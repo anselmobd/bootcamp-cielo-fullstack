@@ -89,12 +89,12 @@ public class AppConfiguration {
     }
 
     @Bean
-    public EnumMap<Type, String> sqsUrl() {
+    public EnumMap<Type, String> sqsType2Url() {
         EnumMap<Type, String> url = new EnumMap<>(Type.class);
         url.put(Type.ELOGIO, this.queueElogioUrl);
         url.put(Type.CRITICA, this.queueCriticasUrl);
         url.put(Type.SUGESTAO, this.queueSugestaoUrl);
-        System.out.println("========== url");
+        System.out.println("========== sqsType2Url");
         System.out.println(url);
         return url;
     }
