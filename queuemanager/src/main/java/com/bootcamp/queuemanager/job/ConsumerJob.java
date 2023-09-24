@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@EnableScheduling
+//@EnableScheduling  !!anselmo
 public class ConsumerJob {
 
     private final SQSConsumer sqsConsumer;
@@ -29,6 +29,7 @@ public class ConsumerJob {
 
     @Scheduled(fixedRate = 15000)
     public void consumirSQSs() {
+        System.out.println("consumirSQSs!");
         sqsConsumer.processMessages(queueSugestaoUrl);
         sqsConsumer.processMessages(queueElogioUrl);
         sqsConsumer.processMessages(queueCriticasUrl);
