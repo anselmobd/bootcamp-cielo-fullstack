@@ -51,6 +51,7 @@ public class FeedbackService {
                 Type.valueOf(tipo),
                 "mess"
         );
+        LOG.info("[consumeMessage] feedback: {}",  feedback.toString());
         return feedback;
     }
 
