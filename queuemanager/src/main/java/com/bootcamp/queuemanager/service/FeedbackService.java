@@ -77,28 +77,22 @@ public class FeedbackService {
         return true;
     }
 
-    public CustomerFeedbackDTO consumeMessage (String tipo) {
+    public CustomerFeedbackDTO consumeMessage (String tipoMsg) {
         CustomerFeedbackDTO feedback = new CustomerFeedbackDTO(
                 "id",
                 Status.RECEBIDO,
-                Type.valueOf(tipo),
+                Type.valueOf(tipoMsg),
                 "mess"
         );
         LOG.info("[consumeMessage] feedback: {}",  feedback);
 
         LOG.info("[consumeMessage] config.sqsUrl: {}",  sqsUrl);
-        String url = sqsUrl.get(Type.valueOf(tipo));
+        String url = sqsUrl.get(Type.valueOf(tipoMsg));
         LOG.info("[consumeMessage] url: {}",  url);
         Boolean ok = this.tryGetMessage(url);
         if (ok) {
             LOG.info("[consumeMessage] feedback: {}",  message.toString());
         }
-//        CustomerFeedbackDTO feedback = new CustomerFeedbackDTO(
-//                message.MessageId,
-//                Status.RECEBIDO,
-//                Type.valueOf(tipo),
-//                "mess"
-//        );
         return feedback;
     }
 
