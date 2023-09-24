@@ -5,6 +5,9 @@ import com.bootcamp.queuemanager.dto.CustomerFeedbackRequestDTO;
 import com.bootcamp.queuemanager.publisher.SNSPublisher;
 import com.bootcamp.queuemanager.util.Status;
 import com.bootcamp.queuemanager.util.Type;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ public class FeedbackService {
     private final EnumMap<Type, String> sqsType2Url;
 
     private Message message;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     public FeedbackService(SNSPublisher snsPublisher, ConcurrentHashMap<Type, LinkedList<CustomerFeedbackDTO>> sqsDataStorage, SqsClient sqsClient, EnumMap<Type, String> sqsType2Url) {
@@ -92,14 +96,23 @@ public class FeedbackService {
         LOG.info("[consumeMessage] url: {}",  url);
         Boolean ok = this.tryGetMessage(url);
         if (ok) {
-            LOG.info("[consumeMessage] message.toString: {}",  message.toString());
-            LOG.info("[consumeMessage] message.attributes: {}",  message.messageAttributes());
+            LOG.info("[consumeMessage] message.toString: {}",  this.message.toString());
+            LOG.info("[consumeMessage] message.attributes: {}",  this.message.messageAttributes());
         }
+        String messageBody = this.message.body();
+        String messageValue;
+        try {
+            JsonNode jsonNode = objectMapper.readTree(messageBody);
+            messageValue = jsonNode.get("Message").asText();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         feedback = new CustomerFeedbackDTO(
-            message.messageId(),
-            Status.RECEBIDO,
-            Type.valueOf(tipoMsg),
-            "message"
+                this.message.messageId(),
+                Status.RECEBIDO,
+                Type.valueOf(tipoMsg),
+                messageValue
         );
         return feedback;
     }
