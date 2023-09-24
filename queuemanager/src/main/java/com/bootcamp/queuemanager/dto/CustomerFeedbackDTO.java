@@ -10,6 +10,13 @@ public class CustomerFeedbackDTO {
     private Type type;
     private String message;
 
+    public CustomerFeedbackDTO(String id, Status status, Type type, String message) {
+        this.id = id;
+        this.status = status;
+        this.type = type;
+        this.message = message;
+    }
+
     public CustomerFeedbackDTO(Type type, String message) {
         this.type = type;
         this.message = message;

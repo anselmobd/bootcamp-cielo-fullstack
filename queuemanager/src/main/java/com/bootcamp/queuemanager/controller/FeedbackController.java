@@ -46,4 +46,12 @@ public class FeedbackController {
         LinkedList<CustomerFeedbackDTO> feedbacks = feedbackService.getQueueInformation(tipo);
         return ResponseEntity.ok(feedbacks);
     }
+
+    @Operation(
+            summary = "Consome uma mensagem de determinada fila")
+    @GetMapping("/sqs/consumer")
+    public ResponseEntity<CustomerFeedbackDTO> consumeMessage (@RequestParam String tipo) {
+        CustomerFeedbackDTO feedback = feedbackService.consumeMessage(tipo);
+        return ResponseEntity.ok(feedback);
+    }
 }

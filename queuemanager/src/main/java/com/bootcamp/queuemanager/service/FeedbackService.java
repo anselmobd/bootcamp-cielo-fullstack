@@ -3,6 +3,7 @@ package com.bootcamp.queuemanager.service;
 import com.bootcamp.queuemanager.dto.CustomerFeedbackDTO;
 import com.bootcamp.queuemanager.dto.CustomerFeedbackRequestDTO;
 import com.bootcamp.queuemanager.publisher.SNSPublisher;
+import com.bootcamp.queuemanager.util.Status;
 import com.bootcamp.queuemanager.util.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,16 @@ public class FeedbackService {
 
     public LinkedList<CustomerFeedbackDTO> getQueueInformation(String type) {
         return sqsDataStorage.get(Type.valueOf(type));
+    }
+
+    public CustomerFeedbackDTO consumeMessage (String tipo) {
+        CustomerFeedbackDTO feedback = new CustomerFeedbackDTO(
+                "id",
+                Status.RECEBIDO,
+                Type.valueOf(tipo),
+                "mess"
+        );
+        return feedback;
     }
 
 }
